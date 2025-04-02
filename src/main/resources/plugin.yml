@@ -1,0 +1,8 @@
+name: Postal
+version: '1.0-SNAPSHOT'
+main: me.brokencloud.postal.Postal
+api-version: '1.21'
+
+commands:
+  postal:
+    description: Postal Command
