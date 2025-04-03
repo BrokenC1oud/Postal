@@ -25,11 +25,17 @@ public class Package {
         this.createdAt = new Date();
     }
 
+    public Package() {}
+
     public ObjectId getId() {
         return id;
     }
 
     public Date getUnwrappedAt() {
         return unwrappedAt;
+    }
+
+    public List<ItemStackModel> getContents() {
+        return contents;
     }
 }

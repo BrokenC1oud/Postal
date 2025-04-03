@@ -14,8 +14,20 @@ import java.util.Base64;
 public class ItemStackModel {
     private String data;
 
+    public ItemStackModel() {}
+
     public ItemStackModel(ItemStack itemStack) {
         this.data = this.serializeItemStackToBase64(itemStack);
+    }
+
+    public ItemStack deserialize() {
+        try {
+            return this.deserializeItemStackFromBase64(this.data);
+        } catch (IOException | ClassNotFoundException exception) {
+            //noinspection CallToPrintStackTrace
+            exception.printStackTrace();
+        }
+        return null;
     }
 
     public String serializeItemStackToBase64(ItemStack itemStack) {
