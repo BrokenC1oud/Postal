@@ -20,6 +20,11 @@ import java.util.stream.IntStream;
 )
 public final class SendMenu implements PlayerMenuProvider {
     private static final int[] GRIDS = IntStream.range(0, 18).toArray();
+    private final Player recipient;
+
+    public SendMenu(Player recipient) {
+        this.recipient = recipient;
+    }
 
     @Override
     public void onLoad(@Nonnull Player player, @Nonnull MenuContents menuContents) {
@@ -33,8 +38,10 @@ public final class SendMenu implements PlayerMenuProvider {
                 if (itemStack == null || itemStack.getType().isAir()) continue;
                 items.add(new ItemStackModel(itemStack));
             }
-            // TODO
-            Package pack = new Package(player.getUniqueId(), player.getUniqueId(), items);
+            if (items.isEmpty()) {
+                return;
+            }
+            Package pack = new Package(player.getUniqueId(), this.recipient.getUniqueId(), items);
             Postal.getInstance().mongoDBManager.sendPackage(pack);
         });
     }

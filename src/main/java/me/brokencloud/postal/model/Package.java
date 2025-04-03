@@ -31,11 +31,15 @@ public class Package {
         return id;
     }
 
-    public Date getUnwrappedAt() {
-        return unwrappedAt;
-    }
-
     public List<ItemStackModel> getContents() {
         return contents;
+    }
+
+    public UUID getSenderId() {
+        return senderId;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
     }
 }
