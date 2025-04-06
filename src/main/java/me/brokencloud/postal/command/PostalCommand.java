@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 public class PostalCommand implements CommandExecutor {
@@ -24,7 +25,6 @@ public class PostalCommand implements CommandExecutor {
                                 player.sendMessage(ChatColor.RED + "Player " + args[1] + " not found.");
                             } else {
                                 Postal.getInstance().getOdalitaMenus().openMenu(new SendMenu(recipient), player);
-                                player.sendMessage(ChatColor.GREEN + "Package sent to " + args[1]);
                             }
                         } else {
                             player.sendMessage(ChatColor.RED + "Usage: /postal send <player>");
@@ -35,6 +35,16 @@ public class PostalCommand implements CommandExecutor {
                 }
             } else {
                 player.sendMessage(ChatColor.RED + "Usage: /postal [list|send]");
+            }
+        } else if (sender instanceof ConsoleCommandSender) {
+            if (args.length != 0) {
+                switch (args[0]) {
+                    case "send":
+                        // send sb sth amount
+                        if (args.length == 4) {
+
+                        }
+                }
             }
         }
         return true;

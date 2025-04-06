@@ -43,6 +43,7 @@ public final class SendMenu implements PlayerMenuProvider {
             }
             Package pack = new Package(player.getUniqueId(), this.recipient.getUniqueId(), items);
             Postal.getInstance().mongoDBManager.sendPackage(pack);
+            System.out.println("Package sent to " + this.recipient.getDisplayName());
         });
     }
 }

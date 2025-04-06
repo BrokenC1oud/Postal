@@ -2,6 +2,7 @@ package me.brokencloud.postal;
 
 import me.brokencloud.postal.command.PostalCommand;
 import me.brokencloud.postal.database.MongoDBManager;
+import me.brokencloud.postal.events.PostalListener;
 import nl.odalitadevelopments.menus.OdalitaMenus;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,6 +28,7 @@ public final class Postal extends JavaPlugin {
         instance = this;
 
         Objects.requireNonNull(getCommand("postal")).setExecutor(new PostalCommand());
+        getServer().getPluginManager().registerEvents(new PostalListener(), this);
 
         odalitaMenus = OdalitaMenus.createInstance(this);
 
