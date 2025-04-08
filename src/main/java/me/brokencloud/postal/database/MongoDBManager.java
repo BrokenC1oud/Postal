@@ -17,7 +17,6 @@ import org.bson.UuidRepresentation;
 import org.bson.types.ObjectId;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class MongoDBManager {
             datastore = Morphia.createDatastore(mongoClient, database);
 
             //noinspection removal
-            datastore.getMapper().map(ItemStackModel.class, Claim.class, Recipient.class,  Package.class);
+            datastore.getMapper().map(ItemStackModel.class, Claim.class, Recipient.class, Package.class);
             System.out.println("Database setup successful!");
         } catch (Exception exception) {
             //noinspection CallToPrintStackTrace
@@ -56,6 +55,11 @@ public class MongoDBManager {
         datastore.save(pack);
     }
 
+    /**
+     * send a package by id to recipient
+     * @param packId package id
+     * @param player recipient
+     */
     public void sendPackage(ObjectId packId, Player player) {
         datastore.find(Package.class)
                 .filter(Filters.eq("id", packId))
@@ -63,6 +67,11 @@ public class MongoDBManager {
                         "recipients", new Recipient(Recipient.RecipientType.Player, player.getUniqueId())));
     }
 
+    /**
+     * query unclaimed packages of a player
+     * @param player whose packages to query
+     * @return list of unclaimed packages
+     */
     public List<Package> listPackages(Player player) {
         return datastore.find(Package.class)
                 .filter(
@@ -78,6 +87,12 @@ public class MongoDBManager {
                 .iterator().toList();
     }
 
+    /**
+     * claim a package
+     * @param pack package to claim
+     * @param player player claiming the package
+     * @return package contents
+     */
     public List<ItemStack> claimPackage(Package pack, Player player) {
         if (datastore.find(Package.class)
                 .filter(

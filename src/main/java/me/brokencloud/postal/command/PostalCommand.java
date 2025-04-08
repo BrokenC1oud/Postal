@@ -9,7 +9,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,20 +25,24 @@ public class PostalCommand implements CommandExecutor {
             if (args.length != 0) {
                 switch (args[0]) {
                     case "create":
-                        if (args.length == 2) {
-                            Postal.getInstance().getOdalitaMenus().openMenu(new CreatePackageMenu(Bukkit.getPlayer(args[1])), player);
-                        } else {
-                            Postal.getInstance().getOdalitaMenus().openMenu(new CreatePackageMenu(), player);
-                        }
+                        // /postal create
+                        // create a package and return its identifier
+                        Postal.getInstance().getOdalitaMenus().openMenu(new CreatePackageMenu(), player);
                         break;
                     case "list":
+                        // /postal list
+                        // list unclaimed packages
                         Postal.getInstance().getOdalitaMenus().openMenu(new ListPackagesMenu(), player);
                         break;
                     case "send":
-                        if (args.length == 3) {
+                        // /postal send <player> [package]
+                        // send player a package (new if package not specified)
+                        if (args.length == 2) {
+                            Postal.getInstance().getOdalitaMenus().openMenu(new CreatePackageMenu(Bukkit.getPlayer(args[1])), player);
+                        } else if (args.length == 3) {
                             Postal.getInstance().mongoDBManager.sendPackage(new ObjectId(args[2]), Bukkit.getPlayer(args[1]));
                         } else {
-                            player.sendMessage(ChatColor.RED + "Usage: /postal send <player> <package>");
+                            player.sendMessage(ChatColor.RED + "Usage: /postal send <player> [package]");
                         }
                         break;
                     default:
@@ -48,8 +51,6 @@ public class PostalCommand implements CommandExecutor {
             } else {
                 player.sendMessage(ChatColor.RED + "Usage: /postal [create|send|list]");
             }
-        } else if (sender instanceof ConsoleCommandSender) {
-            // TODO
         }
         return true;
     }
