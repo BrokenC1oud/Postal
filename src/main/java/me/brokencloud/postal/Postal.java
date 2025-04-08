@@ -32,7 +32,7 @@ public final class Postal extends JavaPlugin {
 
         odalitaMenus = OdalitaMenus.createInstance(this);
 
-        mongoDBManager.connect("mongodb+srv://jgbsxx20130315:xtnSAyhZOFqoVPO0@cluster0.lrxrdho.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "postal");
+        mongoDBManager.connect("mongodb://root:123456@localhost:27017", "postal");
     }
 
     @Override

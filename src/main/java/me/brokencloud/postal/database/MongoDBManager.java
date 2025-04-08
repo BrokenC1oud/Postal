@@ -9,14 +9,16 @@ import dev.morphia.Morphia;
 import dev.morphia.UpdateOptions;
 import dev.morphia.query.filters.Filters;
 import dev.morphia.query.updates.UpdateOperators;
+import me.brokencloud.postal.model.Claim;
 import me.brokencloud.postal.model.ItemStackModel;
 import me.brokencloud.postal.model.Package;
+import me.brokencloud.postal.model.Recipient;
 import org.bson.UuidRepresentation;
-import org.bukkit.entity.Item;
+import org.bson.types.ObjectId;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
 import java.util.List;
 
 public class MongoDBManager {
@@ -33,7 +35,7 @@ public class MongoDBManager {
             datastore = Morphia.createDatastore(mongoClient, database);
 
             //noinspection removal
-            datastore.getMapper().map(ItemStackModel.class, Package.class);
+            datastore.getMapper().map(ItemStackModel.class, Claim.class, Recipient.class,  Package.class);
             System.out.println("Database setup successful!");
         } catch (Exception exception) {
             //noinspection CallToPrintStackTrace
@@ -50,25 +52,45 @@ public class MongoDBManager {
         }
     }
 
-    public void sendPackage(Package pack) {
+    public void savePackage(Package pack) {
         datastore.save(pack);
+    }
+
+    public void sendPackage(ObjectId packId, Player player) {
+        datastore.find(Package.class)
+                .filter(Filters.eq("id", packId))
+                .update(new UpdateOptions(), UpdateOperators.addToSet(
+                        "recipients", new Recipient(Recipient.RecipientType.Player, player.getUniqueId())));
     }
 
     public List<Package> listPackages(Player player) {
         return datastore.find(Package.class)
-                .filter(Filters.and(
-                        Filters.eq("recipientId", player.getUniqueId()),
-                        Filters.eq("unwrappedAt", null)
-                ))
+                .filter(
+                        Filters.or(
+                                Filters.and(
+                                        Filters.eq("recipients.recipientId", player.getUniqueId()),
+                                        Filters.eq("recipients.recipientType", Recipient.RecipientType.Player)
+                                ),
+                                Filters.eq("recipients.recipientType", Recipient.RecipientType.All)
+                        ),
+                        Filters.elemMatch("claims", Filters.eq("uuid", player.getUniqueId())).not()
+                )
                 .iterator().toList();
     }
 
-    public List<ItemStack> unwrapPackage(Package pack) {
-        datastore.find(Package.class)
-                .filter(Filters.eq("id", pack.getId()))
-                .update(new UpdateOptions(), UpdateOperators.set("unwrappedAt", new Date()));
-        return pack.getContents().stream()
-                .map(ItemStackModel::deserialize)
-                .toList();
+    public List<ItemStack> claimPackage(Package pack, Player player) {
+        if (datastore.find(Package.class)
+                .filter(
+                        Filters.eq("id", pack.getId()),
+                        Filters.elemMatch("claims", Filters.eq("uuid", player.getUniqueId())))
+                .count() == 0
+        ) {
+            datastore.find(Package.class)
+                    .filter(Filters.eq("id", pack.getId()))
+                    .update(new UpdateOptions(), UpdateOperators.addToSet("claims", new Claim(player.getUniqueId())));
+            return pack.getContents().stream().map(ItemStackModel::deserialize).toList();
+        } else {
+            return List.of();
+        }
     }
 }

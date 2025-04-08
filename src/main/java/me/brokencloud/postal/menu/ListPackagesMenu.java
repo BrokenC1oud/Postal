@@ -1,5 +1,6 @@
 package me.brokencloud.postal.menu;
 
+
 import me.brokencloud.postal.Postal;
 import me.brokencloud.postal.model.Package;
 import nl.odalitadevelopments.menus.annotations.Menu;
@@ -13,38 +14,40 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static me.brokencloud.postal.Postal.getInstance;
+import java.util.List;
+import java.util.UUID;
 
 @Menu(
-        title = "List of package"
+        title = "Packages"
 )
-public final class ListMenu implements PlayerMenuProvider {
-    @Override
-    public void onLoad(@Nonnull Player player, @Nonnull MenuContents menuContents) {
-        List<Package> packages = getInstance().mongoDBManager.listPackages(player);
+public class ListPackagesMenu implements PlayerMenuProvider {
+    public ListPackagesMenu() {}
 
-        int length = Math.min(packages.size(), 18);
-        for (int i = 0; i < length; i++) {
+    @Override
+    public void onLoad(@NotNull Player player, @NotNull MenuContents menuContents) {
+        fillPackages(player, menuContents);
+    }
+
+    private void fillPackages(@NotNull Player player, @NotNull MenuContents menuContents) {
+        List<Package> packages = Postal.getInstance().mongoDBManager.listPackages(player);
+        for (int i = 0; i < 18; i++) {
             int finalI = i;
-            menuContents.setClickable(i, packageSkull(packages.get(i)), inventoryClickEvent -> {
-                List<ItemStack> itemStacks =  Postal.getInstance().mongoDBManager.unwrapPackage(packages.get(finalI));
-                for (ItemStack itemStack : itemStacks) {
-                    player.getInventory().addItem(itemStack);
-                }
-                menuContents.closeInventory(player, PlaceableItemsCloseAction.REMOVE);
-            });
+            if (i < packages.size()) {
+                menuContents.setClickable(i, packageSkull(packages.get(i)), inventoryClickEvent -> {
+                    for (ItemStack itemStack : Postal.getInstance().mongoDBManager.claimPackage(packages.get(finalI), player))
+                        player.getInventory().addItem(itemStack);
+                    fillPackages(player, menuContents);
+                });
+            } else menuContents.clear(i);
         }
     }
 
     private static ItemStack packageSkull(Package pack) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
         PlayerTextures textures = profile.getTextures();
         try {
@@ -57,8 +60,7 @@ public final class ListMenu implements PlayerMenuProvider {
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         assert meta != null;
         meta.setOwnerProfile(profile);
-        meta.setDisplayName("Package from " + Objects.requireNonNull(Bukkit.getPlayer(pack.getSenderId())).getName());
-        meta.setLore(List.of("Contents: " + pack.getContents().size() + " item(s)", "Sent: " + sdf.format(pack.getCreatedAt())));
+        meta.setDisplayName("Package from " + pack.getId());
         head.setItemMeta(meta);
         return head;
     }
