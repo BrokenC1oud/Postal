@@ -3,6 +3,7 @@ package me.brokencloud.postal.command;
 import me.brokencloud.postal.Postal;
 import me.brokencloud.postal.menu.CreatePackageMenu;
 import me.brokencloud.postal.menu.ListPackagesMenu;
+import me.brokencloud.postal.model.Recipient;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,9 +26,11 @@ public class PostalCommand implements CommandExecutor {
             if (args.length != 0) {
                 switch (args[0]) {
                     case "create":
-                        // /postal create
+                        // /postal create <description>
                         // create a package and return its identifier
-                        Postal.getInstance().getOdalitaMenus().openMenu(new CreatePackageMenu(), player);
+                        if (args.length == 2) {
+                            Postal.getInstance().getOdalitaMenus().openMenu(new CreatePackageMenu(args[1]), player);
+                        } else player.sendMessage(ChatColor.RED + "Invalid Argument");
                         break;
                     case "list":
                         // /postal list
@@ -43,6 +46,12 @@ public class PostalCommand implements CommandExecutor {
                             Postal.getInstance().mongoDBManager.sendPackage(new ObjectId(args[2]), Bukkit.getPlayer(args[1]));
                         } else {
                             player.sendMessage(ChatColor.RED + "Usage: /postal send <player> [package]");
+                        }
+                        break;
+                    case "send_all":
+                        // /postal send_all <package>
+                        if (args.length == 2) {
+                            Postal.getInstance().mongoDBManager.addRecipient(new ObjectId(args[1]), new Recipient(Recipient.RecipientType.All, null));
                         }
                         break;
                     default:

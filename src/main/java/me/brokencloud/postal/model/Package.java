@@ -14,6 +14,7 @@ public class Package {
     @Id
     private ObjectId id;
     private UUID sender;
+    private String description;
     private List<Recipient> recipients;
     private Date createdAt;
     private List<ItemStackModel> contents;
@@ -29,6 +30,7 @@ public class Package {
         this.contents = contents;
         this.sender = sender.getUniqueId();
         this.recipients = List.of(new Recipient(Recipient.RecipientType.Player, recipient.getUniqueId()));
+        this.description = "Package from " + sender.getDisplayName();
         this.createdAt = new Date();
     }
 
@@ -36,8 +38,9 @@ public class Package {
      * general package constructor
      * @param contents package contents
      */
-    public Package(List<ItemStackModel> contents) {
+    public Package(List<ItemStackModel> contents, String description) {
         this.contents = contents;
+        this.description = description;
         this.createdAt = new Date();
     }
 
@@ -53,5 +56,13 @@ public class Package {
 
     public List<ItemStackModel> getContents() {
         return this.contents;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public UUID getSender() {
+        return sender;
     }
 }

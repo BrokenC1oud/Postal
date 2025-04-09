@@ -1,5 +1,6 @@
 package me.brokencloud.postal.model;
 
+import com.mongodb.lang.Nullable;
 import dev.morphia.annotations.Entity;
 
 import java.util.UUID;
@@ -11,7 +12,7 @@ public class Recipient {
 
     public Recipient() {}
 
-    public Recipient(RecipientType recipientType, UUID recipientId) {
+    public Recipient(RecipientType recipientType, @Nullable UUID recipientId) {
         this.recipientType = recipientType;
         this.recipientId = recipientId;
     }

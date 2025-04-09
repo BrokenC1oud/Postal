@@ -15,7 +15,7 @@ public class PostalCommandTabCompletion implements TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            return List.of("create", "list", "send");
+            return List.of("create", "list", "send", "send_all");
         }
         if (args.length == 2 && args[0].equals("send")) {
             return Bukkit.getOnlinePlayers().stream().map(Player::getDisplayName).toList();

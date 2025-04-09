@@ -19,9 +19,11 @@ import java.util.stream.IntStream;
 )
 public final class CreatePackageMenu implements PlayerMenuProvider {
     private static final int[] GRIDS = IntStream.range(0, 18).toArray();
+    private String description;
     private final Player recipient;
 
-    public CreatePackageMenu() {
+    public CreatePackageMenu(String description) {
+        this.description = description;
         this.recipient = null;
     }
 
@@ -42,10 +44,12 @@ public final class CreatePackageMenu implements PlayerMenuProvider {
             if (recipient != null) {
                 pack = new Package(items, player, recipient);
             } else {
-                pack = new Package(items);
+                pack = new Package(items, description);
             }
             Postal.getInstance().mongoDBManager.savePackage(pack);
-            player.sendMessage(ChatColor.GREEN + "Package created with id: " + pack.getId());
+            if (recipient == null) {
+                player.sendMessage(ChatColor.GREEN + "Package created with id " + pack.getId());
+            }
         });
     }
 }

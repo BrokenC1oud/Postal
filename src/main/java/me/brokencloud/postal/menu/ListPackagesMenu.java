@@ -5,7 +5,6 @@ import me.brokencloud.postal.Postal;
 import me.brokencloud.postal.model.Package;
 import nl.odalitadevelopments.menus.annotations.Menu;
 import nl.odalitadevelopments.menus.contents.MenuContents;
-import nl.odalitadevelopments.menus.contents.placeableitem.PlaceableItemsCloseAction;
 import nl.odalitadevelopments.menus.menu.providers.PlayerMenuProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +24,8 @@ import java.util.UUID;
         title = "Packages"
 )
 public class ListPackagesMenu implements PlayerMenuProvider {
-    public ListPackagesMenu() {}
+    public ListPackagesMenu() {
+    }
 
     @Override
     public void onLoad(@NotNull Player player, @NotNull MenuContents menuContents) {
@@ -60,7 +59,7 @@ public class ListPackagesMenu implements PlayerMenuProvider {
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         assert meta != null;
         meta.setOwnerProfile(profile);
-        meta.setDisplayName("Package from " + pack.getId());
+        meta.setDisplayName(pack.getDescription());
         head.setItemMeta(meta);
         return head;
     }

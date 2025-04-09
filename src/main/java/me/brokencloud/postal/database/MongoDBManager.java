@@ -55,16 +55,21 @@ public class MongoDBManager {
         datastore.save(pack);
     }
 
+    public void addRecipient(ObjectId packId, Recipient recipient) {
+        datastore.find(Package.class)
+                .filter(Filters.eq("id", packId))
+                .update(new UpdateOptions(), UpdateOperators.addToSet(
+                        "recipients", recipient
+                ));
+    }
+
     /**
      * send a package by id to recipient
      * @param packId package id
      * @param player recipient
      */
     public void sendPackage(ObjectId packId, Player player) {
-        datastore.find(Package.class)
-                .filter(Filters.eq("id", packId))
-                .update(new UpdateOptions(), UpdateOperators.addToSet(
-                        "recipients", new Recipient(Recipient.RecipientType.Player, player.getUniqueId())));
+        addRecipient(packId, new Recipient(Recipient.RecipientType.Player, player.getUniqueId()));
     }
 
     /**
